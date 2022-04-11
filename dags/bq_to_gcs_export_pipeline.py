@@ -50,7 +50,7 @@ for export_config in file_export_configs:
     start_export = DummyOperator(task_id="start_task", dag=dag)
     end_export = DummyOperator(task_id="end_task", dag=dag)
 
-    # Step1: Move files from active to archive
+    # Step 1: Move files from active to archive
     move_file_archive = GCSToGCSOperator(
         task_id="move_to_archive",
         source_bucket=GCP_SHARED_DESTINATION_BUCKET_NAME,
@@ -62,7 +62,7 @@ for export_config in file_export_configs:
         dag=dag
     )
 
-    # Step2: Get last export date from CDC master for source table
+    # Step 2: Get last export date from CDC master for source table
     fetch_last_export_date = PythonOperator(
         task_id="fetch_last_export_date",
         python_callable=fetch_last_exported_date,
@@ -76,6 +76,7 @@ for export_config in file_export_configs:
         dag=dag
     )
 
+    # Step 3: Check if data exist, skip later steps if data don't exist
     check_count = PythonOperator(
         task_id="check_count",
         python_callable=check_record_count,
@@ -89,6 +90,7 @@ for export_config in file_export_configs:
         dag=dag
     )
 
+    # Step 4: Export data from BigQuery to GCS using Export data option using SQL
     export_bq_to_gcs = BigQueryInsertJobOperator(
          task_id='export_bq_to_gcs',
          configuration={
@@ -108,6 +110,7 @@ for export_config in file_export_configs:
          dag=dag
      )
 
+    # Step 5: Update CDC details for next run 
     update_cdc_master = PythonOperator(
         task_id='update_cdc_master',
         python_callable=insert_cdc_details,
