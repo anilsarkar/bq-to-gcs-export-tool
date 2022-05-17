@@ -7,5 +7,6 @@ Prerequisites:</br>
 pip install apache-airflow<br>
 pip install apache-airflow-providers-google
 
+<br/> <br/> 
 <img width="394" alt="gcs-export" src="https://user-images.githubusercontent.com/23714951/168889376-89fe8482-e313-4eb7-99a4-c211a218bb2f.png">
 
